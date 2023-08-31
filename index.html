@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videochiamata con Vonage</title>
+
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+	
+	<style>
+	.participant {
+		border: 2px solid #333;
+		border-radius: 8px;
+		margin: 10px;
+		width: 320px;
+		height: 240px;
+		overflow: hidden;  /* Assicurati che il video non fuoriesca dal contenitore */
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		
+		background: linear-gradient(45deg, #f06, #9f6);
+
+		box-shadow: inset 0 0 10px #000000;
+
+		background: rgba(255, 255, 255, 0.7); /* Bianco con il 70% di opacità */
+		backdrop-filter: blur(5px);
+
+		animation: slideInFromRight 0.5s forwards;
+		
+		transform: scale(1.05); /* Inggrandisce il riquadro del 5% */
+		transition: transform 0.3s;
+
+		border-radius: 15px;
+		border: 5px solid;
+		border-image-source: url('path-to-your-image.png');
+		border-image-slice: 30;
+		border-image-repeat: round;
+
+	}
+	
+	@keyframes slideInFromRight 
+	{
+		0% {
+			transform: translateX(100%);
+		}
+		100% {
+			transform: translateX(0);
+		}
+	}
+
+	</style>
+</head>
+<body>
+
+<div id="videos">
+    <div id="subscriber"></div>
+    <div id="publisher"></div>
+</div>
+
+
+<script>
+    const SERVER_BASE_URL = 'https://localhost:44318';  // Indirizzo del tuo backend .NET Core
+    fetch(`${SERVER_BASE_URL}/api/videocall/session`)
+    .then(res => {
+        return res.json();
+    })
+        .then(data => {
+        console.log(data);  // Logga la risposta per assicurarti che contenga ApiKey, SessionId e Token
+
+        session = OT.initSession(data.apiKey, data.sessionId);
+		console.log('sss', data.apiKey, data.sessionId, data.token);
+        session.connect(data.token, function(error) {
+            if (error) {
+                console.error("Error connecting:", error.name, error.message);
+            } else {
+                const publisher = OT.initPublisher('publisher');
+                session.publish(publisher);
+
+                session.on('streamCreated', function(event) {
+                    const subscriberDiv = document.createElement('div');
+					subscriberDiv.className = "participant";
+                    document.getElementById('subscriber').appendChild(subscriberDiv);
+
+					<!-- var x = document.getElementById('publisher'); -->
+					<!-- x.className = "participant"; -->
+                    session.subscribe(event.stream, subscriberDiv);
+                });
+            }
+        });
+    })
+    .catch(err => {
+        console.error("Failed to connect:", err);
+    });
+
+
+</script>
+
+</body>
+</html>

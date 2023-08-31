@@ -58,7 +58,8 @@
 
 
 <script>
-    const SERVER_BASE_URL = 'https://localhost:44318';  // Indirizzo del tuo backend .NET Core
+    //const SERVER_BASE_URL = 'https://localhost:44318';  // Indirizzo del tuo backend .NET Core
+	const SERVER_BASE_URL = 'https://videocameraserver.azurewebsites.net';
     fetch(`${SERVER_BASE_URL}/api/videocall/session`)
     .then(res => {
         return res.json();
